@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+publish/
+*_wpftmp.csproj
+*.Backup.tmp
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+Properties/PublishProfiles/
+
+# Local shop data: never commit
+*.db
+*.db-shm
+*.db-wal
+Yedekler/

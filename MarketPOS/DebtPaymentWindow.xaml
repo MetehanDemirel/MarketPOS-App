@@ -1,0 +1,142 @@
+<Window x:Class="MarketPOS.DebtPaymentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Borç Ödeme" Height="550" Width="850"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+
+    <Border Background="#F8FAFC" CornerRadius="20" Padding="25">
+        <Border.Effect>
+            <DropShadowEffect RenderingBias="Performance" Color="#64748B" Opacity="0.2" BlurRadius="25" ShadowDepth="10"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="30" /> <!-- Spacer -->
+                <ColumnDefinition Width="1.2*" /> <!-- Receipts List -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Column: Generic Payment -->
+            <StackPanel Grid.Column="0">
+                <!-- Header -->
+                <Grid Margin="0,0,0,30">
+                    <TextBlock Text="💰 Borç Tahsilat" FontSize="24" FontWeight="ExtraBold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock Text="{Binding CustomerName}" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" Foreground="#334155" TextAlignment="Center" TextWrapping="Wrap"/>
+
+                <!-- Current Debt Box -->
+                <Border Background="#FEF2F2" CornerRadius="16" Padding="20" Margin="0,0,0,25" BorderBrush="#FECACA" BorderThickness="2">
+                    <StackPanel>
+                        <TextBlock Text="GÜNCEL BORÇ BAKİYESİ" Foreground="#EF4444" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentDebt, StringFormat={}{0:N2} ₺}" Foreground="#B91C1C" FontWeight="Black" FontSize="40" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Pay Input -->
+                <TextBlock Text="Ödenecek Tutar" FontWeight="Bold" Foreground="#64748B" Margin="0,0,0,8"/>
+                <Grid Margin="0,0,0,30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox x:Name="TxtAmount" Height="55" VerticalContentAlignment="Center" FontSize="24" FontWeight="Bold" Padding="15,0" 
+                             BorderBrush="#10B981" BorderThickness="2" Foreground="#1E293B">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="12"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <Button Content="TÜMÜ" Click="BtnPayAll_Click" Grid.Column="1" Width="90" Height="55" Background="#64748B" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="10,0,0,0" Cursor="Hand" FontSize="16">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="12"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+
+                <!-- Action Button -->
+                <Button Content="ÖDEMEYİ AL" Click="BtnConfirm_Click" Height="65" Background="#10B981" Foreground="White" FontWeight="Bold" FontSize="20" BorderThickness="0" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="16"/>
+                        </Style>
+                    </Button.Resources>
+                    <Button.Effect>
+                        <DropShadowEffect RenderingBias="Performance" Color="#10B981" Opacity="0.3" BlurRadius="15" ShadowDepth="5"/>
+                    </Button.Effect>
+                </Button>
+            </StackPanel>
+
+            <!-- Vertical Divider -->
+            <Border Grid.Column="1" Width="2" Background="#E2E8F0" HorizontalAlignment="Center" Margin="0,20"/>
+
+            <!-- Right Column: Unpaid Receipts -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <TextBlock Text="🧾 Ödenmemiş Fişler" FontSize="20" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                    <Button Content="✕" IsCancel="True" HorizontalAlignment="Right" VerticalAlignment="Center" Width="40" Height="40" Background="#F1F5F9" Foreground="#64748B" 
+                            FontSize="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="20"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1" PanningMode="VerticalOnly" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="ListUnpaidReceipts">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" CornerRadius="12" Padding="15" Margin="0,0,10,15" BorderBrush="#E2E8F0" BorderThickness="1">
+                                    <Border.Effect>
+                                        <DropShadowEffect RenderingBias="Performance" Color="#000000" Opacity="0.03" BlurRadius="10" ShadowDepth="2"/>
+                                    </Border.Effect>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Date, StringFormat={}{0:dd MMM yyyy - HH:mm}}" FontSize="14" Foreground="#64748B" Margin="0,0,0,5"/>
+                                            <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N2} ₺}" FontSize="20" FontWeight="Black" Foreground="#1E293B"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="🔍" Click="BtnViewReceipt_Click" Tag="{Binding}" Width="45" Height="45" Margin="0,0,10,0" Background="#F1F5F9" Foreground="#64748B" FontSize="18" BorderThickness="0" Cursor="Hand" ToolTip="Fişi İncele">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="12"/>
+                                                    </Style>
+                                                </Button.Resources>
+                                            </Button>
+                                            <Button Content="ÖDE" Click="BtnPayReceipt_Click" Tag="{Binding}" Width="75" Height="45" Background="#2563EB" Foreground="White" FontWeight="Bold" FontSize="16" BorderThickness="0" Cursor="Hand" ToolTip="Fişi Kapat">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="12"/>
+                                                    </Style>
+                                                </Button.Resources>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

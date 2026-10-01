@@ -1,0 +1,154 @@
+<Window x:Class="MarketPOS.TransactionDetailWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Islem Detayi" Height="650" Width="500"
+    WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+    WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+
+    <Border Background="#F3F4F6" CornerRadius="20" Padding="25">
+        <Border.Effect>
+            <DropShadowEffect RenderingBias="Performance" Color="#64748B" Opacity="0.2" BlurRadius="25" ShadowDepth="10" />
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="🧾 Fiş Detayı" FontSize="24" FontWeight="ExtraBold"
+                        Foreground="#1E293B" HorizontalAlignment="Center" />
+                    <TextBlock
+                        Text="{Binding SelectedTransaction.Date, StringFormat='dd MMMM yyyy HH:mm'}"
+                        FontSize="14" Foreground="#64748B" HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <Button Content="✕" IsCancel="True" Click="BtnClose_Click"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Height="40"
+                    Background="White" Foreground="#64748B"
+                    FontSize="20" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="20" />
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+
+            <!-- Receipt Layout -->
+            <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="0">
+                <Border.Effect>
+                    <DropShadowEffect RenderingBias="Performance" Color="#000000" Opacity="0.05" BlurRadius="10" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#1E293B" CornerRadius="12,12,0,0"
+                        Padding="15,10">
+                        <DockPanel>
+                            <TextBlock
+                                Text="{Binding SelectedTransaction.Id, StringFormat='Fis No: #{0}'}"
+                                FontSize="13" FontWeight="Bold" Foreground="White"
+                                VerticalAlignment="Center" />
+                            <Border Background="{Binding TransactionColor}" CornerRadius="6"
+                                Padding="8,2" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding SelectedTransaction.Type}" FontSize="11"
+                                    FontWeight="Bold" Foreground="#1E293B" />
+                            </Border>
+                        </DockPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="15">
+                        <ItemsControl ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                                Foreground="#334155" FontSize="13"
+                                                TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Quantity}"
+                                                    Foreground="#64748B" FontSize="12" />
+                                                <TextBlock Text=" x " Foreground="#94A3B8"
+                                                    FontSize="12" />
+                                                <TextBlock
+                                                    Text="{Binding PriceAtSale, StringFormat={}{0:N2} ₺}"
+                                                    Foreground="#64748B" FontSize="12" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1"
+                                            Text="{Binding Total, StringFormat={}{0:N2} ₺}"
+                                            FontWeight="Bold" Foreground="#1E293B" FontSize="14"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" BorderBrush="#E2E8F0" BorderThickness="0,2,0,0"
+                        Padding="15">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,5">
+                                <TextBlock Text="Ödeme Yöntemi" Foreground="#64748B" FontSize="12" />
+                                <TextBlock Text="{Binding SelectedTransaction.PaymentMethod}"
+                                    FontWeight="Bold" HorizontalAlignment="Right"
+                                    Foreground="#334155" FontSize="12" />
+                            </DockPanel>
+
+                            <!-- NEW: Detailed Breakdown -->
+                            <Border Background="#F8FAFC" CornerRadius="6" Padding="8"
+                                Margin="0,2,0,5">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,2">
+                                        <TextBlock Text="💵 Nakit" Foreground="#64748B"
+                                            FontSize="11" />
+                                        <TextBlock
+                                            Text="{Binding SelectedTransaction.ReceivedCash, StringFormat={}{0:N2} ₺}"
+                                            FontWeight="SemiBold" HorizontalAlignment="Right"
+                                            Foreground="#334155" FontSize="11" />
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="💳 Kart" Foreground="#64748B" FontSize="11" />
+                                        <TextBlock
+                                            Text="{Binding SelectedTransaction.ReceivedCard, StringFormat={}{0:N2} ₺}"
+                                            FontWeight="SemiBold" HorizontalAlignment="Right"
+                                            Foreground="#334155" FontSize="11" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Info -->
+                            <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1"
+                                Margin="0,5,0,10" Height="1" />
+                            <DockPanel>
+                                <TextBlock Text="TOPLAM" FontSize="16" FontWeight="Bold"
+                                    Foreground="#0F172A" VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding SelectedTransaction.TotalAmount, StringFormat={}{0:N2} ₺}"
+                                    FontSize="24" FontWeight="Black" Foreground="#2563EB"
+                                    HorizontalAlignment="Right" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+
+        </Grid>
+    </Border>
+</Window>

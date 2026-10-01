@@ -1,0 +1,1219 @@
+<Window x:Class="MarketPOS.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:MarketPOS.ViewModels"
+    Title="Mr Bufe Market" Height="800" Width="1280"
+    WindowStartupLocation="CenterScreen" WindowState="Maximized" Background="#F1F5F9"
+    PreviewTextInput="Window_PreviewTextInput">
+
+    <Window.DataContext>
+        <local:MainViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="25" />
+        </Style>
+
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="RowHeaderWidth" Value="0" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="#F1F5F9" />
+            <Setter Property="RowHeight" Value="70" /> <!-- Increased for touch/wrapping -->
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="FontSize" Value="16" /> <!-- Increased font -->
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Foreground" Value="#94A3B8" />
+                        <Setter Property="Padding" Value="15,0,0,15" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="BorderBrush" Value="#E2E8F0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="CellStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="15,0" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SlimTabStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" Width="70" Height="65" Margin="0,0,0,15"
+                            CornerRadius="12" Background="Transparent" Cursor="Hand">
+                            <ContentPresenter VerticalAlignment="Center"
+                                HorizontalAlignment="Center" ContentSource="Header" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#2563EB" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter TargetName="Border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect RenderingBias="Performance" Color="#2563EB" BlurRadius="15"
+                                            Opacity="0.4" ShadowDepth="4" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background"
+                                    Value="Transparent" />
+                                <Setter Property="Foreground" Value="#94A3B8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FontSize" Value="28" />
+        </Style>
+
+        <Style x:Key="RoundedBtn" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10"
+                            Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,20,0,20" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentTime}" FontSize="20" FontWeight="ExtraBold"
+                        Foreground="#1E293B" HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrentDate}" FontSize="10" FontWeight="SemiBold"
+                        Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,2,0,0" />
+                </StackPanel>
+
+                <TabControl Grid.Row="1" x:Name="SolMenuTabs"
+                    SelectedIndex="{Binding SelectedTabIndex}" TabStripPlacement="Left"
+                    Background="Transparent" BorderThickness="0" HorizontalAlignment="Center">
+                    <TabItem Header="🛒" Style="{StaticResource SlimTabStyle}"
+                        ToolTip="Satış Kasası" />
+                    <TabItem Header="📦" Style="{StaticResource SlimTabStyle}" ToolTip="Envanter" />
+                    <TabItem Header="📒" Style="{StaticResource SlimTabStyle}"
+                        ToolTip="Veresiye Defteri" />
+                    <TabItem Header="📊" Style="{StaticResource SlimTabStyle}" ToolTip="Raporlar" />
+                    <TabItem Header="📋" Style="{StaticResource SlimTabStyle}"
+                        ToolTip="İşlem Geçmişi" />
+                </TabControl>
+
+                <StackPanel Grid.Row="2" Margin="0,0,0,20" VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding AppVersion}" FontSize="9" Foreground="#94A3B8"
+                        HorizontalAlignment="Center" Margin="0,5,0,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Column="1" Background="Transparent" BorderThickness="0"
+            SelectedIndex="{Binding ElementName=SolMenuTabs, Path=SelectedIndex}" SelectionChanged="TabControl_SelectionChanged">
+
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Style>
+            </TabControl.ItemContainerStyle>
+
+            <TabItem>
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ProductColWidth}" />
+                        <ColumnDefinition Width="1.4*" /> <!-- Wider Cart -->
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0" Margin="0,0,15,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Background="White" CornerRadius="12" Padding="10"
+                            Margin="0,0,0,15" BorderBrush="#E2E8F0" BorderThickness="1">
+                            <DockPanel>
+
+
+                                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0,10,0"
+                                    FontSize="20" Foreground="#94A3B8" />
+                                <TextBox x:Name="TxtBarcode"
+                                    Text="{Binding SalesSearchInput, UpdateSourceTrigger=PropertyChanged}"
+                                    FontSize="22" FontWeight="SemiBold" BorderThickness="0"
+                                    VerticalContentAlignment="Center" Height="40">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding AddToCartCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Main Content Area: Categories OR Products -->
+                        <Grid Grid.Row="1">
+
+                            <!-- CATEGORY VIEW (Tiles) -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                PanningMode="VerticalOnly">
+                                <ScrollViewer.Style>
+                                    <Style TargetType="ScrollViewer">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCategoryView}"
+                                                Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ScrollViewer.Style>
+
+                                <ItemsControl ItemsSource="{Binding FilteredCategories}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding}" Margin="0,0,15,15"
+                                                Width="140" Height="100"
+                                                Command="{Binding DataContext.OpenCategoryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                FontSize="18" FontWeight="Bold" Foreground="#1E293B"
+                                                Background="White" BorderBrush="#E2E8F0"
+                                                BorderThickness="1">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="bd"
+                                                            Background="{TemplateBinding Background}"
+                                                            CornerRadius="16"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="1">
+                                                            <ContentPresenter
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                TextElement.FontWeight="Bold" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver"
+                                                                Value="True">
+                                                                <Setter TargetName="bd"
+                                                                    Property="Background"
+                                                                    Value="#F1F5F9" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <!-- PRODUCT VIEW (Grid + Back Button) -->
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCategoryView}"
+                                                Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Back Button Header -->
+                                <Button Grid.Row="0" Margin="0,0,0,15" Height="50"
+                                    HorizontalAlignment="Stretch"
+                                    Command="{Binding BackToCategoriesCommand}"
+                                    Background="#3B82F6" Foreground="White" BorderThickness="0"
+                                    Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="12">
+                                                <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock Text="⬅" FontSize="20"
+                                                        FontWeight="Bold" Margin="0,0,10,0" />
+                                                    <TextBlock Text="{Binding SalesCategoryFilter}"
+                                                        FontSize="18" FontWeight="Bold"
+                                                        VerticalAlignment="Center" />
+                                                    <TextBlock Text=" (KATEGORİLER)" FontSize="14"
+                                                        FontWeight="SemiBold" Opacity="0.8"
+                                                        VerticalAlignment="Center" Margin="5,2,0,0" />
+                                                </StackPanel>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                                <ScrollViewer Grid.Row="1" PanningMode="VerticalOnly">
+                                    <ItemsControl ItemsSource="{Binding SalesProducts}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Margin="0,0,15,15" Width="190" Height="150"
+                                                    Command="{Binding DataContext.AddSpecificProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="White"
+                                                                CornerRadius="16"
+                                                                Padding="10" BorderBrush="#F1F5F9"
+                                                                BorderThickness="1">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect
+                                                                        Color="#64748B"
+                                                                        Opacity="0.05"
+                                                                        BlurRadius="10"
+                                                                        ShadowDepth="2" />
+                                                                </Border.Effect>
+                                                                <Grid>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="*" />
+                                                                        <RowDefinition Height="Auto" />
+                                                                    </Grid.RowDefinitions>
+                                                                    <StackPanel
+                                                                        VerticalAlignment="Center">
+                                                                        <TextBlock
+                                                                            Text="{Binding Name}"
+                                                                            FontWeight="Bold"
+                                                                            FontSize="18"
+                                                                            TextWrapping="Wrap"
+                                                                            TextAlignment="Center"
+                                                                            Foreground="#1E293B"
+                                                                            MaxHeight="80"
+                                                                            TextTrimming="CharacterEllipsis" />
+                                                                        <Border Background="#F1F5F9"
+                                                                            CornerRadius="6"
+                                                                            Padding="8,2"
+                                                                            Margin="0,5"
+                                                                            HorizontalAlignment="Center">
+                                                                            <TextBlock
+                                                                                Text="{Binding Stock, StringFormat=Stok: {0}}"
+                                                                                FontSize="12"
+                                                                                Foreground="#64748B"
+                                                                                FontWeight="Bold" />
+                                                                        </Border>
+                                                                    </StackPanel>
+                                                                    <TextBlock Grid.Row="1"
+                                                                        Text="{Binding Price, StringFormat={}{0:N2} ₺}"
+                                                                        Foreground="#10B981"
+                                                                        FontSize="22"
+                                                                        FontWeight="ExtraBold"
+                                                                        TextAlignment="Center" />
+                                                                </Grid>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                
+                                <!-- Sales Pagination Footer -->
+                                <Border Grid.Row="2" Background="#FFFFFF" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect RenderingBias="Performance" Color="#E2E8F0" Opacity="0.5" BlurRadius="10" ShadowDepth="2" />
+                                    </Border.Effect>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Button Content="◀ ÖNCEKİ" Command="{Binding PrevSalesPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                                        
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="Sayfa: " FontSize="14" FontWeight="SemiBold" Foreground="#64748B" />
+                                            <TextBlock Text="{Binding CurrentSalesPage}" FontSize="16" FontWeight="ExtraBold" Foreground="#2563EB" Margin="5,0" />
+                                            <TextBlock Text="/" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Margin="5,0" />
+                                            <TextBlock Text="{Binding TotalSalesPages}" FontSize="14" FontWeight="Bold" Foreground="#64748B" Margin="5,0" />
+                                        </StackPanel>
+                                        
+                                        <Button Grid.Column="2" Content="SONRAKİ ▶" Command="{Binding NextSalesPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <Border Grid.Column="1" Background="White" CornerRadius="16" Padding="20" BorderThickness="2">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="Transparent" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect RenderingBias="Performance" Color="#000000" Opacity="0.05" BlurRadius="20" ShadowDepth="0" />
+                                    </Setter.Value>
+                                </Setter>
+
+                            </Style>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <DockPanel LastChildFill="False" Margin="0,0,0,15">
+                                <TextBlock Text="Sepet" FontSize="26" FontWeight="ExtraBold"
+                                    Foreground="#0F172A" VerticalAlignment="Center" />
+
+                                <Button Command="{Binding ToggleProductGridCommand}"
+                                    Margin="10,0,0,0"
+                                    Width="48" Height="48" Background="#F1F5F9" Foreground="#64748B"
+                                    ToolTip="Menüyü Gizle/Göster"
+                                    BorderThickness="0">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="12" />
+                                        </Style>
+                                    </Button.Resources>
+                                    <TextBlock Text="☰" FontSize="24" FontWeight="Bold" />
+                                </Button>
+
+                                <!-- Small Cart Switchers -->
+                                <StackPanel Orientation="Horizontal" Margin="15,0,0,0" VerticalAlignment="Center">
+                                    <Button Content="1" Command="{Binding SwitchCartCommand}" CommandParameter="0" Width="48" Height="48" Margin="0,0,8,0" FontSize="20" FontWeight="Bold" Cursor="Hand" ToolTip="Sepet 1">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource RoundedBtn}">
+                                                <Setter Property="Background" Value="#F8FAFC"/>
+                                                <Setter Property="Foreground" Value="#94A3B8"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCart1Active}" Value="True">
+                                                        <Setter Property="Background" Value="#2563EB"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="BorderBrush" Value="#2563EB"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="24" /> <!-- Circular -->
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+
+                                    <Button Content="2" Command="{Binding SwitchCartCommand}" CommandParameter="1" Width="48" Height="48" Margin="0,0,8,0" FontSize="20" FontWeight="Bold" Cursor="Hand" ToolTip="Sepet 2">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource RoundedBtn}">
+                                                <Setter Property="Background" Value="#F8FAFC"/>
+                                                <Setter Property="Foreground" Value="#94A3B8"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCart2Active}" Value="True">
+                                                        <Setter Property="Background" Value="#10B981"/> <!-- Distinct Color for Cart 2? Or all blue. Let's stick to blue for active. -->
+                                                        <Setter Property="Background" Value="#2563EB"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="BorderBrush" Value="#2563EB"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="24" />
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+
+                                    <Button Content="3" Command="{Binding SwitchCartCommand}" CommandParameter="2" Width="48" Height="48" FontSize="20" FontWeight="Bold" Cursor="Hand" ToolTip="Sepet 3">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource RoundedBtn}">
+                                                <Setter Property="Background" Value="#F8FAFC"/>
+                                                <Setter Property="Foreground" Value="#94A3B8"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                                <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCart3Active}" Value="True">
+                                                        <Setter Property="Background" Value="#2563EB"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="BorderBrush" Value="#2563EB"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="24" />
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+                                </StackPanel>
+                                <Button Command="{Binding ClearCartCommand}" DockPanel.Dock="Right"
+                                    Background="#FEF2F2" Foreground="#EF4444" BorderThickness="0"
+                                    Height="45" Padding="15,0">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="8" />
+                                        </Style>
+                                    </Button.Resources>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🗑️" FontSize="18"
+                                            VerticalAlignment="Center" />
+                                        <TextBlock Text=" TEMİZLE" FontWeight="Bold" FontSize="14"
+                                            VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </DockPanel>
+
+                            <ScrollViewer Grid.Row="1" PanningMode="VerticalOnly">
+                                <ItemsControl ItemsSource="{Binding Cart}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1"
+                                                Padding="0,15">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="90" />
+                                                        <ColumnDefinition Width="60" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Product.Name}"
+                                                            FontWeight="Bold" Foreground="#334155"
+                                                            FontSize="18" TextWrapping="Wrap" />
+                                                        <TextBlock
+                                                            Text="{Binding Product.Price, StringFormat={}{0:N2} ₺}"
+                                                            Foreground="#94A3B8" FontSize="14"
+                                                            FontWeight="SemiBold" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="1"
+                                                        Orientation="Horizontal"
+                                                        VerticalAlignment="Center" Margin="10,0">
+                                                        <Button Content="-"
+                                                            Command="{Binding DataContext.DecreaseQtyCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Width="45" Height="45"
+                                                            Background="#F1F5F9"
+                                                            Foreground="#1E293B"
+                                                            FontWeight="ExtraBold" FontSize="20"
+                                                            BorderThickness="0">
+                                                            <Button.Resources>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="CornerRadius"
+                                                                        Value="10" />
+                                                                </Style>
+                                                            </Button.Resources>
+                                                        </Button>
+
+                                                        <Border Width="45" Height="45"
+                                                            Background="Transparent">
+                                                            <TextBlock Text="{Binding Quantity}"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                FontWeight="Bold" FontSize="20" />
+                                                        </Border>
+
+                                                        <Button Content="+"
+                                                            Command="{Binding DataContext.IncreaseQtyCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Width="45" Height="45"
+                                                            Background="#2563EB" Foreground="White"
+                                                            FontWeight="ExtraBold" FontSize="20"
+                                                            BorderThickness="0">
+                                                            <Button.Resources>
+                                                                <Style TargetType="Border">
+                                                                    <Setter Property="CornerRadius"
+                                                                        Value="10" />
+                                                                </Style>
+                                                            </Button.Resources>
+                                                        </Button>
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2"
+                                                        Text="{Binding Total, StringFormat={}{0:N2} ₺}"
+                                                        FontWeight="Bold" Foreground="#0F172A"
+                                                        FontSize="18" VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right" />
+
+                                                    <Button Grid.Column="3" Content="✕"
+                                                        Command="{Binding DataContext.RemoveFromCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Width="45" Height="45" Background="#FEE2E2"
+                                                        Foreground="#EF4444" FontWeight="Bold"
+                                                        FontSize="20" BorderThickness="0"
+                                                        HorizontalAlignment="Right"
+                                                        Margin="10,0,0,0">
+                                                        <Button.Resources>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="CornerRadius"
+                                                                    Value="10" />
+                                                            </Style>
+                                                        </Button.Resources>
+                                                    </Button>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <StackPanel Grid.Row="2" Margin="0,20,0,0">
+                                <Border Background="#F8FAFC" CornerRadius="12" Padding="20"
+                                    Margin="0,0,0,20">
+                                    <DockPanel>
+                                        <TextBlock Text="TOPLAM" VerticalAlignment="Center"
+                                            Foreground="#64748B" FontWeight="Bold" FontSize="18" />
+                                        <TextBlock
+                                            Text="{Binding CartTotal, StringFormat={}{0:N2} ₺}"
+                                            FontSize="42" FontWeight="ExtraBold"
+                                            HorizontalAlignment="Right" Foreground="#2563EB" />
+                                    </DockPanel>
+                                </Border>
+
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="15" />
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="15" />
+                                        <ColumnDefinition Width="0.8*" />
+                                        <ColumnDefinition Width="15" />
+                                        <ColumnDefinition Width="0.8*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0" Content="ÖDEME AL"
+                                        Command="{Binding OpenPaymentWindowCommand}"
+                                        Height="80" Foreground="White"
+                                        FontWeight="Bold" FontSize="24">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource RoundedBtn}">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <SolidColorBrush Color="#1E293B" />
+                                                    </Setter.Value>
+                                                </Setter>
+
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Effect>
+                                            <DropShadowEffect RenderingBias="Performance" Color="#1E293B" Opacity="0.4"
+                                                BlurRadius="15" ShadowDepth="4" />
+                                        </Button.Effect>
+                                    </Button>
+
+                                    <Button Grid.Column="2" Content="VERESİYE"
+                                        Command="{Binding CheckoutVeresiyeCommand}"
+                                        Height="80" Background="#F59E0B" Foreground="White"
+                                        FontWeight="Bold" FontSize="18"
+                                        Style="{StaticResource RoundedBtn}">
+                                    </Button>
+
+                                    <Button Grid.Column="4" Content="% İNDİRİM" x:Name="BtnDiscount"
+                                        Height="80" Background="#3B82F6" Foreground="White"
+                                        FontWeight="Bold" FontSize="18" Click="BtnDiscount_Click"
+                                        Style="{StaticResource RoundedBtn}" />
+
+                                    <Button Grid.Column="6" Content="HIZLI ₺" x:Name="BtnQuick"
+                                        Height="80" Background="#8B5CF6" Foreground="White"
+                                        FontWeight="Bold" FontSize="18" Click="BtnQuick_Click"
+                                        Style="{StaticResource RoundedBtn}" />
+                                </Grid>
+
+                                <Button Content="İADE MENÜSÜ" Command="{Binding UndoLastCommand}"
+                                    Height="50" Background="#FFF1F2" Foreground="#E11D48"
+                                    FontWeight="Bold" FontSize="14"
+                                    Style="{StaticResource RoundedBtn}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2.5*" />
+                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- PRIMARY: Name Search -->
+                        <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="10" BorderBrush="#CBD5E1" BorderThickness="1.5">
+                            <DockPanel>
+                                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="10,0,10,0" FontSize="20" Foreground="#3B82F6" />
+                                <TextBox x:Name="TxtInventoryName" Text="{Binding InventoryNameSearchInput, UpdateSourceTrigger=PropertyChanged}" FontSize="18" FontWeight="SemiBold" BorderThickness="0" VerticalContentAlignment="Center" Tag="Ürün Adı ile Ara (Enter)">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding SearchInventoryByNameCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- SECONDARY: Barcode Scanner -->
+                        <Border Grid.Column="2" Background="#F8FAFC" CornerRadius="12" Padding="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                            <DockPanel>
+                                <TextBlock Text="📷" VerticalAlignment="Center" Margin="10,0,10,0" FontSize="16" Foreground="#94A3B8" />
+                                <TextBox x:Name="TxtInventory" Text="{Binding InventorySearchInput, UpdateSourceTrigger=PropertyChanged}" FontSize="14" BorderThickness="0" VerticalContentAlignment="Center" Background="Transparent" Tag="Barkod Tara" Foreground="#64748B">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding OpenInventoryEditCommand}" />
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </DockPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="20,0,0,0" HorizontalAlignment="Right">
+                            <Button Content="📁 KATEGORİLER"
+                                Command="{Binding OpenCategoryManagerCommand}" Background="#F8FAFC"
+                                Foreground="#475569" FontWeight="Bold" Height="50" Padding="25,0"
+                                Margin="0,0,15,0" Style="{StaticResource RoundedBtn}" />
+                            <Button Content="+ YENİ ÜRÜN" Command="{Binding OpenAddProductCommand}"
+                                Background="#2563EB" Foreground="White" FontWeight="Bold"
+                                Height="50" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Grid.Row="1" Background="#F1F5F9" CornerRadius="8" Padding="20,15"
+                        Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="180" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Barkod" FontWeight="Bold" Foreground="#64748B" />
+                            <TextBlock Grid.Column="1" Text="Ürün Adı" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="2" Text="Kategori" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="3" Text="Satış" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="4" Text="Maliyet" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="5" Text="Kâr" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="6" Text="Stok" FontWeight="Bold"
+                                Foreground="#64748B" />
+                            <TextBlock Grid.Column="7" Text="İşlemler" FontWeight="Bold"
+                                Foreground="#64748B" HorizontalAlignment="Right" Margin="0,0,10,0" />
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <ScrollViewer PanningMode="VerticalOnly">
+                            <ItemsControl ItemsSource="{Binding InventoryProducts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="White" CornerRadius="12" Padding="15"
+                                            Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="2*" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="100" />
+                                                    <ColumnDefinition Width="180" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Text="{Binding Barcode}"
+                                                    Foreground="#94A3B8" VerticalAlignment="Center"
+                                                    FontSize="14" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                    FontWeight="Bold" VerticalAlignment="Center"
+                                                    FontSize="16" TextWrapping="Wrap" Margin="0,5" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Category}"
+                                                    VerticalAlignment="Center" FontSize="14" />
+                                                <TextBlock Grid.Column="3"
+                                                    Text="{Binding Price, StringFormat={}{0:N2}}"
+                                                    FontWeight="Bold" Foreground="#10B981"
+                                                    VerticalAlignment="Center" FontSize="16" />
+                                                <TextBlock Grid.Column="4"
+                                                    Text="{Binding Cost, StringFormat={}{0:N2}}"
+                                                    Foreground="#EF4444" VerticalAlignment="Center"
+                                                    FontSize="14" />
+                                                <TextBlock Grid.Column="5"
+                                                    Text="{Binding Profit, StringFormat={}{0:N2}}"
+                                                    FontWeight="SemiBold" Foreground="#3B82F6"
+                                                    VerticalAlignment="Center" FontSize="14" />
+
+                                                <Border Grid.Column="6" Background="#F1F5F9"
+                                                    CornerRadius="6" Padding="10,5"
+                                                    HorizontalAlignment="Left">
+                                                    <TextBlock Text="{Binding Stock}"
+                                                        FontWeight="Bold" VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <StackPanel Grid.Column="7" Orientation="Horizontal"
+                                                    HorizontalAlignment="Right">
+                                                    <Button Content="DÜZENLE"
+                                                        Command="{Binding DataContext.OpenEditProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#3B82F6" Foreground="White"
+                                                        Width="90" Height="40" FontSize="12"
+                                                        FontWeight="Bold" Margin="0,0,10,0"
+                                                        Style="{StaticResource RoundedBtn}" />
+                                                    <Button Content="SİL"
+                                                        Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#FEE2E2" Foreground="#EF4444"
+                                                        Width="60" Height="40" FontSize="12"
+                                                        FontWeight="Bold"
+                                                        Style="{StaticResource RoundedBtn}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                    
+                    <!-- Pagination Footer -->
+                    <Border Grid.Row="3" Background="#FFFFFF" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect RenderingBias="Performance" Color="#E2E8F0" Opacity="0.5" BlurRadius="10" ShadowDepth="2" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button Content="◀ ÖNCEKİ SAYFA" Command="{Binding PrevPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="Sayfa: " FontSize="16" FontWeight="SemiBold" Foreground="#64748B" />
+                                <TextBlock Text="{Binding CurrentInventoryPage}" FontSize="18" FontWeight="ExtraBold" Foreground="#2563EB" Margin="5,0" />
+                                <TextBlock Text="/" FontSize="16" FontWeight="SemiBold" Foreground="#64748B" Margin="5,0" />
+                                <TextBlock Text="{Binding TotalInventoryPages}" FontSize="16" FontWeight="Bold" Foreground="#64748B" Margin="5,0" />
+                            </StackPanel>
+                            
+                            <Button Grid.Column="2" Content="SONRAKİ SAYFA ▶" Command="{Binding NextPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,20">
+                        <TextBlock Text="Veresiye Defteri" FontSize="28" FontWeight="ExtraBold"
+                            Foreground="#1E293B" VerticalAlignment="Center" />
+                        <Button Content="+ MÜŞTERİ EKLE" Command="{Binding OpenAddCustomerCommand}"
+                            HorizontalAlignment="Right" Background="#2563EB" Foreground="White"
+                            FontWeight="Bold" Height="50" Padding="30,0"
+                            Style="{StaticResource RoundedBtn}" />
+                    </DockPanel>
+
+                    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="15"
+                        Margin="0,0,0,20">
+                        <DockPanel>
+                            <TextBlock Text="🔍" VerticalAlignment="Center" Margin="10,0,10,0"
+                                FontSize="18" Foreground="#94A3B8" />
+                            <TextBox
+                                Text="{Binding CustomerSearchInput, UpdateSourceTrigger=PropertyChanged}"
+                                FontSize="18" BorderThickness="0" VerticalContentAlignment="Center"
+                                Tag="Müşteri ara..." />
+                        </DockPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="2" PanningMode="VerticalOnly">
+                        <ItemsControl ItemsSource="{Binding DisplayedCustomers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" CornerRadius="16" Padding="20"
+                                        Margin="0,0,0,15">
+                                        <Border.Effect>
+                                            <DropShadowEffect RenderingBias="Performance" Color="#64748B" Opacity="0.05"
+                                                BlurRadius="10" />
+                                        </Border.Effect>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="1*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontSize="20"
+                                                    FontWeight="Bold" Foreground="#1E293B"
+                                                    TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Phone}" FontSize="16"
+                                                    Foreground="#94A3B8" Margin="0,5,0,0" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center"
+                                                HorizontalAlignment="Right" Margin="0,0,40,0">
+                                                <TextBlock Text="Borç Bakiyesi" FontSize="12"
+                                                    Foreground="#64748B" HorizontalAlignment="Right" />
+                                                <TextBlock
+                                                    Text="{Binding DebtBalance, StringFormat={}{0:N2} ₺}"
+                                                    FontSize="28" FontWeight="ExtraBold"
+                                                    Foreground="#EF4444" HorizontalAlignment="Right" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right">
+                                                <Button Content="💰 TAHSİLAT"
+                                                    Command="{Binding DataContext.PayDebtCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#10B981" Foreground="White"
+                                                    FontWeight="Bold" Height="50" Padding="15,0"
+                                                    Margin="0,0,10,0"
+                                                    Style="{StaticResource RoundedBtn}" />
+
+                                                <Button Content="📋 GEÇMİŞ"
+                                                    Command="{Binding DataContext.OpenCustomerHistoryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#3B82F6" Foreground="White"
+                                                    FontWeight="Bold" Height="50" Padding="15,0"
+                                                    Margin="0,0,10,0"
+                                                    Style="{StaticResource RoundedBtn}" />
+
+                                                <Button Content="SİL"
+                                                    Command="{Binding DataContext.DeleteCustomerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#FEE2E2" Foreground="#EF4444"
+                                                    FontWeight="Bold" Height="50" Padding="15,0"
+                                                    Style="{StaticResource RoundedBtn}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Background="White" CornerRadius="12" Padding="10">
+                            <StackPanel Orientation="Horizontal">
+                                <DatePicker SelectedDate="{Binding ReportStartDate}" Width="140"
+                                    Height="40" VerticalContentAlignment="Center" FontSize="14" />
+                                <TextBlock Text="➙" VerticalAlignment="Center" Margin="10,0"
+                                    Foreground="#94A3B8" />
+                                <DatePicker SelectedDate="{Binding ReportEndDate}" Width="140"
+                                    Height="40" VerticalContentAlignment="Center" FontSize="14" />
+                                <Button Content="RAPORU GETİR"
+                                    Command="{Binding CalculateReportCommand}" Margin="15,0,0,0"
+                                    Width="140" Height="40" Background="#1E293B" Foreground="White"
+                                    FontWeight="Bold" Style="{StaticResource RoundedBtn}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="White" CornerRadius="12" Padding="10"
+                            Width="250">
+                            <DockPanel>
+                                <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0,10,0"
+                                    FontSize="16" Foreground="#94A3B8" />
+                                <TextBox
+                                    Text="{Binding ReportSearchFiNo, UpdateSourceTrigger=PropertyChanged}"
+                                    VerticalContentAlignment="Center" BorderThickness="0"
+                                    FontSize="16" Tag="Fiş No Ara..." />
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,20">
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Border Background="#8B5CF6" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#8B5CF6" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="BU AYKİ TOPLAM CİRO" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding CurrentMonthCiro, StringFormat={}{0:N2} ₺}" FontSize="32" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#EC4899" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#EC4899" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="BU HAFTAKİ CİRO" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding CurrentWeekCiro, StringFormat={}{0:N2} ₺}" FontSize="32" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#10B981" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#10B981" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="TOPLAM CİRO" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding ReportRevenue, StringFormat={}{0:N2} ₺}" FontSize="28" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#3B82F6" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#3B82F6" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="NET KÂR" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding ReportProfit, StringFormat={}{0:N2} ₺}" FontSize="28" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#06B6D4" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#06B6D4" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="KASA MEVCUDU" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding ReportCashInBox, StringFormat={}{0:N2} ₺}" FontSize="28" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F59E0B" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#F59E0B" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="İŞLEM ADEDİ" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding ReportSalesCount}" FontSize="28" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#64748B" CornerRadius="16" Padding="20" Width="250" Margin="10">
+                                <Border.Effect>
+                                    <DropShadowEffect RenderingBias="Performance" Color="#64748B" Opacity="0.3" BlurRadius="15" ShadowDepth="5" />
+                                </Border.Effect>
+                                <StackPanel>
+                                    <TextBlock Text="SAYILMAYAN" Foreground="White" Opacity="0.8" FontSize="12" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding UncountedRevenue, StringFormat={}{0:N2} ₺}" FontSize="28" FontWeight="ExtraBold" Foreground="White" Margin="0,5,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
+                        <Button Content="⚡ HIZLI KASA / GİDER EKLE" Command="{Binding OpenFastCashWindowCommand}"
+                                Width="250" Height="60" Background="#F1F5F9" Foreground="#1E293B" FontWeight="Bold" FontSize="15"
+                                Style="{StaticResource RoundedBtn}" Margin="0,0,20,0" />
+                        <Button Content="📋 FİŞLERİ GÖRÜNTÜLE" Command="{Binding OpenReceiptsWindowCommand}"
+                                Width="250" Height="60" Background="#2563EB" Foreground="White" FontWeight="Bold" FontSize="15"
+                                Style="{StaticResource RoundedBtn}" Margin="0,0,20,0" />
+                        <Button Content="📉 SAYILMAYAN KALEMLERİ GÖR" Command="{Binding OpenUncountedItemsWindowCommand}"
+                                Width="280" Height="60" Background="#64748B" Foreground="White" FontWeight="Bold" FontSize="15"
+                                Style="{StaticResource RoundedBtn}" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="White" CornerRadius="12" Padding="15"
+                        Margin="0,0,0,20">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Kayıtları Filtrele:" VerticalAlignment="Center"
+                                FontWeight="Bold" Foreground="#1E293B" FontSize="16"
+                                Margin="0,0,20,0" />
+
+                            <DatePicker SelectedDate="{Binding LogStartDate}" Width="140"
+                                Height="40" VerticalContentAlignment="Center" />
+                            <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0"
+                                Foreground="#94A3B8" />
+                            <DatePicker SelectedDate="{Binding LogEndDate}" Width="140" Height="40"
+                                VerticalContentAlignment="Center" />
+
+                            <CheckBox IsChecked="{Binding HideFinancialLogs}"
+                                Content="Sadece Sistem Kayıtları (Finansalı Gizle)"
+                                VerticalAlignment="Center" Margin="25,0,0,0" FontSize="14" />
+
+                            <Button Content="LİSTEYİ YENİLE" Command="{Binding RefreshLogsCommand}"
+                                Margin="25,0,0,0" Width="140" Height="40" Background="#F1F5F9"
+                                Foreground="#475569" FontWeight="Bold"
+                                Style="{StaticResource RoundedBtn}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Row="1" Background="White" CornerRadius="16" Padding="5">
+                        <DataGrid ItemsSource="{Binding SystemLogs}" AutoGenerateColumns="False"
+                            IsReadOnly="True" GridLinesVisibility="Horizontal">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="{Binding LogColor}" />
+                                    <Setter Property="Height" Value="55" />
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Tarih / Saat"
+                                    Binding="{Binding Date, StringFormat='dd.MM.yyyy HH:mm:ss'}"
+                                    Width="160" Foreground="#64748B" />
+                                <DataGridTextColumn Header="İşlem Tipi"
+                                    Binding="{Binding DisplayActionType}" Width="140" FontWeight="Bold" />
+
+                                <!-- TextWrapping Enabled Description -->
+                                <DataGridTemplateColumn Header="Detay ve Açıklama" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Description}"
+                                                TextWrapping="Wrap" VerticalAlignment="Center"
+                                                Margin="5" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center">
+                                                <Button Content="✏️"
+                                                    Command="{Binding DataContext.OpenEditLogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Cursor="Hand" Margin="0,0,10,0"
+                                                    ToolTip="Düzenle" FontSize="18" />
+
+                                                <Button Content="🗑️"
+                                                    Command="{Binding DataContext.DeleteLogCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" Foreground="#EF4444"
+                                                    BorderThickness="0" Cursor="Hand" ToolTip="Sil"
+                                                    FontSize="18" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                    
+                    <!-- Logs Pagination Footer -->
+                    <Border Grid.Row="2" Background="#FFFFFF" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect RenderingBias="Performance" Color="#E2E8F0" Opacity="0.5" BlurRadius="10" ShadowDepth="2" />
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button Content="◀ ÖNCEKİ" Command="{Binding PrevLogPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="Sayfa: " FontSize="14" FontWeight="SemiBold" Foreground="#64748B" />
+                                <TextBlock Text="{Binding CurrentLogPage}" FontSize="16" FontWeight="ExtraBold" Foreground="#2563EB" Margin="5,0" />
+                                <TextBlock Text="/" FontSize="14" FontWeight="SemiBold" Foreground="#64748B" Margin="5,0" />
+                                <TextBlock Text="{Binding TotalLogPages}" FontSize="14" FontWeight="Bold" Foreground="#64748B" Margin="5,0" />
+                            </StackPanel>
+                            
+                            <Button Grid.Column="2" Content="SONRAKİ ▶" Command="{Binding NextLogPageCommand}" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" Height="45" Padding="25,0" Style="{StaticResource RoundedBtn}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>

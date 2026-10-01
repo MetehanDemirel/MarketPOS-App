@@ -1,0 +1,63 @@
+<Window x:Class="MarketPOS.FastCashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hızlı Kasa İşlemi" Height="250" Width="600"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <Style x:Key="RoundedBtn" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="10"
+                            Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </Window.Resources>
+
+    <Border Background="#F8FAFC" Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="⚡ Hızlı Kasa İşlemi / Gider-Gelir Ekle" VerticalAlignment="Center"
+                                FontWeight="Bold" Foreground="#1E293B" FontSize="20"
+                                Margin="0,0,0,20" HorizontalAlignment="Center" />
+
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                    <TextBox Text="{Binding FinancialDesc}" Width="250" Height="45"
+                        Margin="0,0,10,0" VerticalContentAlignment="Center"
+                        FontSize="16" Tag="Açıklama (Örn: Fatura)" />
+                    <TextBox Text="{Binding FinancialAmount}" Width="150" Height="45"
+                        VerticalContentAlignment="Center"
+                        FontSize="16" FontWeight="Bold" Tag="Tutar" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="GİDER EKLE" Command="{Binding AddExpenseCommand}"
+                        Width="150" Height="50" Background="#FFE4E6"
+                        Foreground="#E11D48" FontWeight="Bold" FontSize="16"
+                        Style="{StaticResource RoundedBtn}" Margin="0,0,15,0" />
+                    <Button Content="KASA GİRİŞ" Command="{Binding AddCashEntryCommand}"
+                        Width="150" Height="50" Background="#DBEAFE"
+                        Foreground="#2563EB" FontWeight="Bold" FontSize="16"
+                        Style="{StaticResource RoundedBtn}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
